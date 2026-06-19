@@ -33,22 +33,22 @@ class _AppRouter extends StatelessWidget {
     return Consumer<GameState>(
       builder: (context, gameState, _) {
         switch (gameState.currentScreen) {
-          case GameScreen.menu:
+          case AppScreen.menu:
             return const MenuScreen();
-          case GameScreen.playing:
+          case AppScreen.playing:
             return const GameScreen();
-          case GameScreen.paused:
-            return const GameScreen(); // Pause handled inside game screen
-          case GameScreen.levelSelect:
+          case AppScreen.paused:
+            return const GameScreen();
+          case AppScreen.levelSelect:
             return const LevelSelectScreen();
-          case GameScreen.settings:
+          case AppScreen.settings:
             return const SettingsScreen();
-          case GameScreen.achievements:
+          case AppScreen.achievements:
             return const AchievementsScreen();
-          case GameScreen.shop:
+          case AppScreen.shop:
             return const ShopScreen();
-          case GameScreen.gameOver:
-            return const GameScreen(); // Handled inside game screen
+          case AppScreen.gameOver:
+            return const GameScreen();
         }
       },
     );

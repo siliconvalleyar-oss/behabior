@@ -7,7 +7,7 @@ import 'package:behabior/data/models/enemy_model.dart';
 
 class Enemy extends BaseEntity {
   final EnemyModel model;
-  double attackRange;
+  double attackRange = 0.0;
   double _attackCooldownTimer = 0.0;
   bool _hasDealtCollisionDamage = false;
 

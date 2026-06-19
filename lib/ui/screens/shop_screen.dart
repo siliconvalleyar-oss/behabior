@@ -33,7 +33,7 @@ class ShopScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => state.navigateTo(GameScreen.menu),
+                      onPressed: () => state.navigateTo(AppScreen.menu),
                     ),
                     const SizedBox(width: 12),
                     const Text(
@@ -338,7 +338,7 @@ class _SkillCard extends StatelessWidget {
       case 'rage':
         return Icons.flash_on;
       case 'nova':
-        return Icons.explosion;
+        return Icons.auto_awesome;
       default:
         return Icons.auto_awesome;
     }

@@ -1,45 +1,93 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:flame/gestures.dart';
-import 'package:flame/palette.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+import 'package:flame/events.dart';
+import 'package:flutter/material.dart' show Colors;
+import 'package:vector_math/vector_math.dart' hide Colors;
 
-class JoystickComponent extends Component with Tappable, Draggable {
+class JoystickComponent extends PositionComponent with DragCallbacks {
   final double knobRadius;
   final double backgroundRadius;
-  final Color backgroundColor;
-  final Color knobColor;
-  final Color activeColor;
+  late final Color backgroundColor;
+  late final Color knobColor;
+  late final Color activeColor;
 
-  Vector2 _knobPosition;
-  Vector2 _delta = Vector2.zero();
+  final Vector2 _knobPosition;
+  final Vector2 _delta = Vector2.zero();
   bool _isDragging = false;
   bool _isVisible = true;
 
-  // Callback for direction
   void Function(Vector2 direction)? onDirectionChanged;
 
   JoystickComponent({
     this.knobRadius = 30.0,
     this.backgroundRadius = 80.0,
-    this.backgroundColor = const Color(0x40FFFFFF),
     this.knobColor = const Color(0x80FFFFFF),
     this.activeColor = const Color(0xB0FFFFFF),
     Vector2? position,
-  })  : _knobPosition = position ?? Vector2.zero(),
-        super();
+    double? size,
+  }) : _knobPosition = position ?? Vector2.zero(),
+       super(position: position ?? Vector2.zero(), size: Vector2(size ?? 300, size ?? 300));
 
   @override
   void onMount() {
     super.onMount();
-    _knobPosition = position;
+    _knobPosition.setFrom(this.position);
+  }
+
+  @override
+  bool containsLocalPoint(Vector2 point) => true;
+
+  Vector2 get delta => _delta;
+  bool get isDragging => _isDragging;
+
+  void show() => _isVisible = true;
+  void hide() => _isVisible = false;
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    if (!_isVisible) return;
+    final startPos = event.canvasPosition;
+    final dist = (startPos - position).length;
+    if (dist <= backgroundRadius * 1.5) {
+      _isDragging = true;
+      _updateKnob(startPos);
+    }
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    if (!_isDragging || !_isVisible) return;
+    _updateKnob(event.canvasEndPosition);
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    if (!_isDragging) return;
+    _isDragging = false;
+    _knobPosition.setFrom(position);
+    _delta.setZero();
+    onDirectionChanged?.call(_delta);
+  }
+
+  void _updateKnob(Vector2 touchPos) {
+    final diff = touchPos - position;
+    final dist = diff.length;
+    if (dist <= backgroundRadius) {
+      _knobPosition.setFrom(touchPos);
+      _delta.setFrom(diff / backgroundRadius);
+    } else {
+      _knobPosition
+        ..setFrom(position + (diff / dist) * backgroundRadius);
+      _delta.setFrom(diff / backgroundRadius);
+    }
+    if (_delta.length > 1.0) _delta.normalize();
+    onDirectionChanged?.call(_delta);
   }
 
   @override
   void render(Canvas canvas) {
     if (!_isVisible) return;
 
-    // Background circle
     final bgPaint = Paint()
       ..color = _isDragging ? activeColor.withOpacity(0.3) : backgroundColor
       ..style = PaintingStyle.fill;
@@ -49,7 +97,6 @@ class JoystickComponent extends Component with Tappable, Draggable {
       bgPaint,
     );
 
-    // Background border
     final borderPaint = Paint()
       ..color = Colors.white.withOpacity(0.3)
       ..style = PaintingStyle.stroke
@@ -60,7 +107,6 @@ class JoystickComponent extends Component with Tappable, Draggable {
       borderPaint,
     );
 
-    // Knob
     final knobPaint = Paint()
       ..color = _isDragging ? activeColor : knobColor
       ..style = PaintingStyle.fill;
@@ -70,7 +116,6 @@ class JoystickComponent extends Component with Tappable, Draggable {
       knobPaint,
     );
 
-    // Direction indicator
     if (_delta.length > 0.1) {
       final indicatorPaint = Paint()
         ..color = Colors.white.withOpacity(0.2)
@@ -83,67 +128,4 @@ class JoystickComponent extends Component with Tappable, Draggable {
       );
     }
   }
-
-  @override
-  bool onTapUp(TapUpInfo info) {
-    if (!_isVisible) return false;
-    final tapPos = info.eventPosition.game;
-    final dist = (tapPos - position).length;
-    if (dist <= backgroundRadius) {
-      _updateKnob(tapPos);
-      return true;
-    }
-    return false;
-  }
-
-  @override
-  bool onDragStart(DragStartInfo info) {
-    if (!_isVisible) return false;
-    final startPos = info.eventPosition.game;
-    final dist = (startPos - position).length;
-    if (dist <= backgroundRadius * 1.5) {
-      _isDragging = true;
-      _updateKnob(startPos);
-      return true;
-    }
-    return false;
-  }
-
-  @override
-  bool onDragUpdate(DragUpdateInfo info) {
-    if (!_isDragging || !_isVisible) return false;
-    _updateKnob(info.eventPosition.game);
-    return true;
-  }
-
-  @override
-  bool onDragEnd(DragEndInfo info) {
-    if (!_isDragging) return false;
-    _isDragging = false;
-    _knobPosition = position.clone();
-    _delta = Vector2.zero();
-    onDirectionChanged?.call(_delta);
-    return true;
-  }
-
-  void _updateKnob(Vector2 touchPos) {
-    final diff = touchPos - position;
-    final dist = diff.length;
-    if (dist <= backgroundRadius) {
-      _knobPosition = touchPos;
-      _delta = diff / backgroundRadius;
-    } else {
-      _knobPosition = position + (diff / dist) * backgroundRadius;
-      _delta = diff / backgroundRadius;
-    }
-    // Normalize delta for direction
-    if (_delta.length > 1.0) _delta.normalize();
-    onDirectionChanged?.call(_delta);
-  }
-
-  Vector2 get delta => _delta;
-  bool get isDragging => _isDragging;
-
-  void show() => _isVisible = true;
-  void hide() => _isVisible = false;
 }

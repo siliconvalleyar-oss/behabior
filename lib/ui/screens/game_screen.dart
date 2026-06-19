@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:behabior/data/providers/game_state.dart';
 import 'package:behabior/data/models/level_model.dart';
 import 'package:behabior/core/core_game.dart';
+import 'package:behabior/core/engine/spawn_engine.dart';
 import 'package:behabior/core/systems/audio_system.dart';
 import 'package:behabior/core/systems/score_system.dart';
 import 'package:behabior/core/systems/wave_system.dart';
@@ -167,7 +168,7 @@ class _GameScreenState extends State<GameScreen>
                   ],
                 ),
                 child: const Icon(
-                  Icons.crosshair,
+                  Icons.my_location,
                   color: Colors.white,
                   size: 30,
                 ),
@@ -179,7 +180,7 @@ class _GameScreenState extends State<GameScreen>
           if (_game.isPaused)
             PauseMenu(
               onResume: () => setState(() => _game.togglePause()),
-              onQuit: () => context.read<GameState>().navigateTo(GameScreen.menu),
+              onQuit: () => context.read<GameState>().navigateTo(AppScreen.menu),
               onRestart: () {
                 _game.dispose();
                 _initializeGame();
@@ -197,7 +198,7 @@ class _GameScreenState extends State<GameScreen>
                 _game.dispose();
                 _initializeGame();
               },
-              onMenu: () => context.read<GameState>().navigateTo(GameScreen.menu),
+              onMenu: () => context.read<GameState>().navigateTo(AppScreen.menu),
             ),
         ],
       ),

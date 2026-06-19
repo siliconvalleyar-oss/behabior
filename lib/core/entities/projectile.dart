@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flame/components.dart';
+import 'package:vector_math/vector_math.dart' hide Colors;
 import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
@@ -39,18 +41,17 @@ class Projectile extends BaseEntity {
     _age += dt;
     position += direction * projectileSpeed * dt;
 
-    // Lifetime check
     if (_age >= lifetime) {
       hasHit = true;
-      isActive = false;
       onExpire?.call(this);
+      removeFromParent();
+      return;
     }
 
-    // Out of bounds check
     if (position.x < -50 || position.x > GameConfig.worldWidth + 50 ||
         position.y < -50 || position.y > GameConfig.worldHeight + 50) {
       hasHit = true;
-      isActive = false;
+      removeFromParent();
     }
   }
 
@@ -58,13 +59,12 @@ class Projectile extends BaseEntity {
   void onCollision(CollisionInfo info) {
     if (hasHit) return;
 
-    // Check layer compatibility
     if ((team == EntityTeam.player && info.layerB == CollisionLayer.enemy) ||
         (team == EntityTeam.player && info.layerB == CollisionLayer.boss) ||
         (team == EntityTeam.enemy && info.layerB == CollisionLayer.player)) {
       hasHit = true;
-      isActive = false;
       onHit?.call(this);
+      removeFromParent();
     }
   }
 }

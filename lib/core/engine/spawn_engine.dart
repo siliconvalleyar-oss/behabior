@@ -143,12 +143,13 @@ class SpawnEngine {
       GameConfig.worldWidth * 0.4,
       GameConfig.worldWidth * 0.5,
     );
-    return Vector2(
+    final v = Vector2(
       _playerPosition!.x + cos(angle) * distance,
       _playerPosition!.y + sin(angle) * distance,
-    ).clamp(
-      Vector2(32, 32),
-      Vector2(GameConfig.worldWidth - 32, GameConfig.worldHeight - 32),
+    );
+    return Vector2(
+      v.x.clamp(32.0, GameConfig.worldWidth - 32),
+      v.y.clamp(32.0, GameConfig.worldHeight - 32),
     );
   }
 

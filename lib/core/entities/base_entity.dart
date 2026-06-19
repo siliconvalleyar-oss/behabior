@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+import 'package:vector_math/vector_math.dart' hide Colors;
+import 'package:behabior/core/engine/collision_system.dart';
 
 enum EntityState { idle, moving, attacking, damaged, dying, dead }
 
@@ -8,9 +9,10 @@ enum EntityTeam { player, enemy, neutral }
 
 class BaseEntity extends PositionComponent with HasHitboxCollision {
   @override
-  Vector2 position;
-  @override
   double hitboxRadius;
+
+  @override
+  Vector2 get pos => position;
   EntityTeam team;
   EntityState _state = EntityState.idle;
   double health;
@@ -28,7 +30,7 @@ class BaseEntity extends PositionComponent with HasHitboxCollision {
     this.speed = 100.0,
     this.damage = 10.0,
     super.size,
-  }) : position = position ?? Vector2.zero();
+  }) : super(position: position ?? Vector2.zero());
 
   EntityState get state => _state;
   set state(EntityState newState) {

@@ -7,14 +7,14 @@ import 'package:behabior/data/repositories/level_repository.dart';
 import 'package:behabior/data/repositories/achievement_repository.dart';
 import 'package:behabior/core/config/game_config.dart';
 
-enum GameScreen { menu, playing, paused, levelSelect, settings, achievements, shop, gameOver }
+enum AppScreen { menu, playing, paused, levelSelect, settings, achievements, shop, gameOver }
 
 class GameState extends ChangeNotifier {
   final SaveRepository saveRepo;
   final LevelRepository levelRepo;
   final AchievementRepository achievementRepo;
 
-  GameScreen _currentScreen = GameScreen.menu;
+  AppScreen _currentScreen = AppScreen.menu;
   int _currentLevelId = 1;
   int _playerLevel = 1;
   int _playerXp = 0;
@@ -88,7 +88,7 @@ class GameState extends ChangeNotifier {
   }
 
   // Screen navigation
-  void navigateTo(GameScreen screen) {
+  void navigateTo(AppScreen screen) {
     _currentScreen = screen;
     notifyListeners();
   }
@@ -97,7 +97,7 @@ class GameState extends ChangeNotifier {
   void startLevel(int levelId) {
     _currentLevelId = levelId;
     _score = 0;
-    _currentScreen = GameScreen.playing;
+    _currentScreen = AppScreen.playing;
     notifyListeners();
   }
 
@@ -110,12 +110,12 @@ class GameState extends ChangeNotifier {
       await levelRepo.saveLevelProgress(updated);
       await levelRepo.unlockNextLevel(levelId);
     }
-    _currentScreen = GameScreen.levelSelect;
+    _currentScreen = AppScreen.levelSelect;
     notifyListeners();
   }
 
   void gameOver() {
-    _currentScreen = GameScreen.gameOver;
+    _currentScreen = AppScreen.gameOver;
     notifyListeners();
   }
 
@@ -182,7 +182,7 @@ class GameState extends ChangeNotifier {
   }
 
   // Getters
-  GameScreen get currentScreen => _currentScreen;
+  AppScreen get currentScreen => _currentScreen;
   int get currentLevelId => _currentLevelId;
   int get playerLevel => _playerLevel;
   int get playerXp => _playerXp;

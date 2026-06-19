@@ -61,9 +61,9 @@ class Player extends BaseEntity {
     }
 
     // Clamp to world bounds
-    position = position.clamp(
-      Vector2(hitboxRadius, hitboxRadius),
-      Vector2(GameConfig.worldWidth - hitboxRadius, GameConfig.worldHeight - hitboxRadius),
+    position.setValues(
+      position.x.clamp(hitboxRadius, GameConfig.worldWidth - hitboxRadius),
+      position.y.clamp(hitboxRadius, GameConfig.worldHeight - hitboxRadius),
     );
 
     // Attack timer
@@ -85,7 +85,7 @@ class Player extends BaseEntity {
     final projectile = Projectile(
       position: position.clone(),
       direction: targetDirection,
-      speed: GameConfig.projectileSpeed,
+      projectileSpeed: GameConfig.projectileSpeed,
       damage: damage * damageMultiplier,
       team: EntityTeam.player,
       size: GameConfig.projectileSize,

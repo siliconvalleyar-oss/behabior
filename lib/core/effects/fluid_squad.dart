@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+import 'package:flutter/material.dart' show Colors;
+import 'package:vector_math/vector_math.dart' hide Colors;
 
 class FluidBlob {
   Vector2 position;

@@ -32,7 +32,7 @@ class LevelSelectScreen extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => state.navigateTo(GameScreen.menu),
+                      onPressed: () => state.navigateTo(AppScreen.menu),
                     ),
                     const SizedBox(width: 12),
                     const Text(

@@ -51,7 +51,7 @@ class GameConfig {
   static const int maxSkillPoints = 50;
   static const int skillPointsPerLevel = 3;
 
-  private constructor() {}
+  GameConfig._();
 
   static Size get worldSize => Size(worldWidth, worldHeight);
 }

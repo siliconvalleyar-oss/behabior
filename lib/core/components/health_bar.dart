@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+import 'package:vector_math/vector_math.dart' hide Colors;
 
 class HealthBarComponent extends PositionComponent {
   double _currentHealth;
@@ -26,8 +26,8 @@ class HealthBarComponent extends PositionComponent {
     Color? fillColor,
     Color? lowHealthColor,
     Color? smoothColor,
-    this._showBackground = true,
-    this._smoothTransition = true,
+    bool showBackground = true,
+    bool smoothTransition = true,
   })  : _currentHealth = currentHealth,
         _maxHealth = maxHealth,
         _targetHealth = currentHealth,
@@ -35,9 +35,11 @@ class HealthBarComponent extends PositionComponent {
         _width = width,
         _height = height,
         _backgroundColor = backgroundColor ?? const Color(0x40FFFFFF),
-        _fillColor = fillColor ?? Colors.green,
-        _lowHealthColor = lowHealthColor ?? Colors.red,
-        _smoothColor = smoothColor ?? Colors.orange.withOpacity(0.5),
+        _fillColor = fillColor ?? const Color(0xFF00B894),
+        _lowHealthColor = lowHealthColor ?? const Color(0xFFD63031),
+        _smoothColor = smoothColor ?? const Color(0xFFFDCB6E).withOpacity(0.5),
+        _showBackground = showBackground,
+        _smoothTransition = smoothTransition,
         super(position: position, size: Vector2(width, height));
 
   void updateHealth(double current, double max) {
@@ -105,7 +107,7 @@ class HealthBarComponent extends PositionComponent {
 
     // Border
     final borderPaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = const Color(0xFFFFFFFF).withOpacity(0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
     canvas.drawRRect(

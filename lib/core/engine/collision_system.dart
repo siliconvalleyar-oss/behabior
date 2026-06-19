@@ -31,27 +31,28 @@ class CollisionInfo {
 }
 
 mixin HasHitboxCollision {
-  Vector2 get position;
   double get hitboxRadius;
   CollisionLayer get collisionLayer;
   bool get isActive;
 
   void onCollision(CollisionInfo info);
 
+  Vector2 get pos;
+
   bool overlaps(HasHitboxCollision other) {
-    final dist = (position - other.position).length;
+    final dist = (pos - other.pos).length;
     return dist < hitboxRadius + other.hitboxRadius;
   }
 
   CollisionInfo? getCollisionInfo(HasHitboxCollision other) {
     if (!overlaps(other)) return null;
-    final normal = (other.position - position)..normalize();
+    final normal = (other.pos - pos)..normalize();
     return CollisionInfo(
       a: this,
       b: other,
       layerA: collisionLayer,
       layerB: other.collisionLayer,
-      contactPoint: (position + other.position) / 2,
+      contactPoint: (pos + other.pos) / 2,
       normal: normal,
     );
   }

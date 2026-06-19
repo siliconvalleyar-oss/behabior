@@ -1,12 +1,13 @@
-import 'dart:ui';
-import 'package:flame/components.dart';
+import 'dart:math' show atan2, cos, sin;
+import 'package:flutter/material.dart' show Colors;
+import 'package:flame/components.dart' hide JoystickComponent;
 import 'package:flame/game.dart';
 import 'package:flame/camera.dart';
-import 'package:flame/input.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector2;
+import 'package:vector_math/vector_math.dart' hide Colors;
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
 import 'package:behabior/core/engine/spawn_engine.dart';
+import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/entities/player.dart';
 import 'package:behabior/core/entities/enemy.dart';
 import 'package:behabior/core/entities/boss.dart';
@@ -25,9 +26,10 @@ import 'package:behabior/core/systems/score_system.dart';
 import 'package:behabior/core/systems/wave_system.dart';
 import 'package:behabior/core/systems/achievement_system.dart';
 import 'package:behabior/core/systems/skill_system.dart';
+import 'package:behabior/data/models/enemy_model.dart';
 import 'package:behabior/data/models/level_model.dart';
 
-class CoreGame extends FlameGame with HasTappables, HasDraggables {
+class CoreGame extends FlameGame {
   // Systems
   final AudioSystem audioSystem;
   final ScoreSystem scoreSystem;
@@ -80,11 +82,9 @@ class CoreGame extends FlameGame with HasTappables, HasDraggables {
     await super.onLoad();
 
     // Camera setup
-    camera = CameraComponent.withFixedSize(
-      world: this,
-      viewport: Viewport(
-        size: Vector2(800, 600),
-      ),
+    camera = CameraComponent.withFixedResolution(
+      width: 800,
+      height: 600,
     );
     camera.viewfinder.zoom = GameConfig.cameraZoom;
 

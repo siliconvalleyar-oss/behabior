@@ -89,7 +89,9 @@ class AudioSystem {
 
   void setMusicVolume(double vol) {
     _musicVolume = vol.clamp(0.0, 1.0);
-    FlameAudio.bgm.setVolume(_musicVolume);
+    try {
+      FlameAudio.bgm.stop();
+    } catch (_) {}
   }
 
   void setSfxVolume(double vol) {
