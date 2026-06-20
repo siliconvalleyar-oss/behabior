@@ -18,7 +18,7 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _game = DinoGame();
-    _updateTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+    _updateTimer = Timer.periodic(const Duration(milliseconds: 50), (_) {
       if (mounted) setState(() {});
     });
   }
@@ -30,22 +30,24 @@ class _GameScreenState extends State<GameScreen> {
     super.dispose();
   }
 
+  void _onTap() {
+    _game.handleTap();
+  }
+
+  void _onTapCancel() {
+    _game.handleRelease();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final gameHeight = size.width * 250 / 900;
-    final gameWidth = size.width;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
-        child: Center(
-          child: SizedBox(
-            width: gameWidth,
-            height: gameHeight,
-            child: GameWidget(
-              game: _game,
-            ),
+        child: GestureDetector(
+          onTap: _onTap,
+          onTapCancel: _onTapCancel,
+          child: GameWidget(
+            game: _game,
           ),
         ),
       ),

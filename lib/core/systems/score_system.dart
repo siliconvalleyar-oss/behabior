@@ -5,10 +5,9 @@ class ScoreSystem {
   double _distance = 0;
 
   void update(double dt) {
-    _distance += speed * dt;
+    _distance += speed * dt * 60;
     score = _distance.toInt();
-    speed = 6.0 + score * 0.001;
-    if (speed > 16.0) speed = 16.0;
+    speed = (6.0 + score * 0.005).clamp(6.0, 18.0);
   }
 
   bool checkHighScore() {
