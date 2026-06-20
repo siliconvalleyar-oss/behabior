@@ -70,6 +70,11 @@ class _GameScreenState extends State<GameScreen>
       if (mounted) {
         setState(() => _gameReady = true);
       }
+    }).catchError((Object error) {
+      debugPrint('[BEHABIOR] Game init error: $error');
+      if (mounted) {
+        setState(() => _gameReady = true);
+      }
     });
   }
 

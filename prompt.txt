@@ -1,0 +1,7 @@
+presiono  play  para jugar  , luego The Awakening .
+ el juego nunca inicia .
+ queda una animacion de un semi anillo  animado girando pero no aparece el juego .
+usar "assets/icon/logo.png" com icono de la aplicacion .
+
+
+
