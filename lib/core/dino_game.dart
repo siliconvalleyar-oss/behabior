@@ -216,13 +216,14 @@ class DinoGame extends FlameGame {
         text: TextSpan(text: 'GAME OVER', style: textStyle.copyWith(fontSize: 30)),
         textDirection: TextDirection.ltr,
       )..layout();
-      go.paint(canvas, Offset((size.x - go.width) / 2, (size.y - go.height) / 2 - 30));
+      final goY = (GameConfig.groundY + size.y) / 2 - go.height / 2;
+      go.paint(canvas, Offset((size.x - go.width) / 2, goY));
 
       final restart = TextPainter(
         text: TextSpan(text: 'TAP TO RESTART', style: textStyle.copyWith(fontSize: 20)),
         textDirection: TextDirection.ltr,
       )..layout();
-      restart.paint(canvas, Offset((size.x - restart.width) / 2, (size.y - restart.height) / 2 + 20));
+      restart.paint(canvas, Offset((size.x - restart.width) / 2, goY + go.height + 14));
     }
   }
 }
