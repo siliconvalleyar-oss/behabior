@@ -6,6 +6,7 @@ import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
 import 'package:behabior/core/utils/math_utils.dart';
+import 'package:behabior/core/components/rive_sprite_component.dart';
 
 enum BossPhase { phase1, phase2, phase3, enraged }
 
@@ -27,6 +28,7 @@ class Boss extends BaseEntity {
   void Function(Vector2 position, Vector2 direction, String attackType)? onAttack;
   void Function(Boss boss, BossPhase newPhase)? onPhaseChange;
 
+  RiveSpriteComponent? _riveComponent;
   late final Sprite _sprite;
 
   Boss({
@@ -47,6 +49,15 @@ class Boss extends BaseEntity {
   @override
   Future<void> onLoad() async {
     _sprite = await Sprite.load('naves/enemy_02.png');
+    final rive = RiveSpriteComponent(
+      assetPath: 'animations/spaceship.riv',
+      size: size * 0.6,
+    )..anchor = Anchor.center;
+    await rive.load();
+    if (rive.isLoaded) {
+      _riveComponent = rive;
+      add(rive);
+    }
   }
 
   @override
@@ -156,6 +167,7 @@ class Boss extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
+    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;

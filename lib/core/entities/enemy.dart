@@ -5,6 +5,7 @@ import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
 import 'package:behabior/data/models/enemy_model.dart';
+import 'package:behabior/core/components/rive_sprite_component.dart';
 
 class Enemy extends BaseEntity {
   final EnemyModel model;
@@ -18,6 +19,7 @@ class Enemy extends BaseEntity {
   void Function(Enemy enemy)? onDeath;
   void Function(Vector2 position, Vector2 direction)? onRangedAttack;
 
+  RiveSpriteComponent? _riveComponent;
   late final Sprite _sprite;
 
   Enemy({
@@ -54,9 +56,32 @@ class Enemy extends BaseEntity {
     }
   }
 
+  String get _riveAssetPath {
+    switch (model.type) {
+      case EnemyType.basic:
+      case EnemyType.healer:
+        return 'animations/centaur.riv';
+      case EnemyType.fast:
+        return 'animations/stasher.riv';
+      case EnemyType.tank:
+      case EnemyType.ranged:
+      case EnemyType.explosive:
+        return 'animations/character.riv';
+    }
+  }
+
   @override
   Future<void> onLoad() async {
     _sprite = await Sprite.load(_spritePath);
+    final rive = RiveSpriteComponent(
+      assetPath: _riveAssetPath,
+      size: size * 0.8,
+    )..anchor = Anchor.center;
+    await rive.load();
+    if (rive.isLoaded) {
+      _riveComponent = rive;
+      add(rive);
+    }
   }
 
   void setTarget(Vector2 target) {
@@ -115,6 +140,7 @@ class Enemy extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
+    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;

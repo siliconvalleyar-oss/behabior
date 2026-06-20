@@ -6,6 +6,7 @@ import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
 import 'package:behabior/core/entities/projectile.dart';
+import 'package:behabior/core/components/rive_sprite_component.dart';
 
 class Player extends BaseEntity {
   Vector2 _moveDirection = Vector2.zero();
@@ -23,6 +24,7 @@ class Player extends BaseEntity {
 
   void Function(Projectile projectile)? onShoot;
 
+  RiveSpriteComponent? _riveComponent;
   late final Sprite _sprite;
 
   Player({
@@ -53,6 +55,36 @@ class Player extends BaseEntity {
   @override
   Future<void> onLoad() async {
     _sprite = await Sprite.load('naves/nave_00.png');
+    final rive = RiveSpriteComponent(
+      assetPath: 'animations/ship_gamekit.riv',
+      artboardName: 'large scene',
+      stateMachineName: 'State Machine 1',
+      size: size * 0.5,
+    )..anchor = Anchor.center;
+    await rive.load();
+    if (rive.isLoaded) {
+      _riveComponent = rive;
+      add(rive);
+    }
+  }
+
+  @override
+  void onStateChanged(EntityState newState) {
+    if (_riveComponent == null || !_riveComponent!.isLoaded) return;
+    switch (newState) {
+      case EntityState.moving:
+        _riveComponent!.setMoving(true);
+        _riveComponent!.setSpeed(speed * speedMultiplier);
+      case EntityState.idle:
+        _riveComponent!.setMoving(false);
+      case EntityState.attacking:
+        _riveComponent!.triggerAttack();
+      case EntityState.damaged:
+        _riveComponent!.triggerHit();
+      case EntityState.dying:
+      case EntityState.dead:
+        _riveComponent!.triggerDeath();
+    }
   }
 
   @override
@@ -123,6 +155,7 @@ class Player extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
+    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;
