@@ -23,10 +23,10 @@ class Dino extends PositionComponent {
   @override
   Future<void> onLoad() async {
     try {
-      _f0 = await Sprite.load('images/dino/dino_run_00.png');
-      _f1 = await Sprite.load('images/dino/dino_run_01.png');
-      _f2 = await Sprite.load('images/dino/dino_run_02.png');
-      _f3 = await Sprite.load('images/dino/dino_run_03.png');
+      _f0 = await Sprite.load('dino/dino_run_00.png');
+      _f1 = await Sprite.load('dino/dino_run_01.png');
+      _f2 = await Sprite.load('dino/dino_run_02.png');
+      _f3 = await Sprite.load('dino/dino_run_03.png');
       _useSprites = true;
     } catch (_) {
       _useSprites = false;
