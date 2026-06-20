@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:behabior/core/config/game_config.dart';
 
-enum DinoState { running, jumping, ducking, dead }
+enum DinoState { running, jumping, dead }
 
 class Dino extends PositionComponent {
   DinoState dinoState = DinoState.running;
@@ -12,37 +12,31 @@ class Dino extends PositionComponent {
   bool _jumpHeld = false;
   double _holdTime = 0;
 
-  Sprite? _run0;
-  Sprite? _run1;
-  Sprite? _run2;
-  Sprite? _run3;
-  Sprite? _run4;
-  Sprite? _run5;
-  Sprite? _run6;
-  Sprite? _run7;
+  bool _useSprites = false;
+  Sprite? _f0;
+  Sprite? _f1;
+  Sprite? _f2;
   Sprite? _dead;
 
-  Dino() : super(size: Vector2(70, 72));
+  Dino() : super(size: Vector2(68, 72));
 
   @override
   Future<void> onLoad() async {
     try {
-      _run0 = await Sprite.load('images/dino/dino_move_00.png');
-      _run1 = await Sprite.load('images/dino/dino_move_01.png');
-      _run2 = await Sprite.load('images/dino/dino_move_02.png');
-      _run3 = await Sprite.load('images/dino/dino_move_03.png');
-      _run4 = await Sprite.load('images/dino/dino_move_04.png');
-      _run5 = await Sprite.load('images/dino/dino_move_05.png');
-      _run6 = await Sprite.load('images/dino/dino_move_06.png');
-      _run7 = await Sprite.load('images/dino/dino_move_07.png');
+      _f0 = await Sprite.load('images/dino/dino_move_00.png');
+      _f1 = await Sprite.load('images/dino/dino_move_01.png');
+      _f2 = await Sprite.load('images/dino/dino_move_02.png');
       _dead = await Sprite.load('images/dino/dino_08.png');
-    } catch (_) {}
+      _useSprites = true;
+    } catch (_) {
+      _useSprites = false;
+    }
     x = GameConfig.dinoX;
     y = GameConfig.groundY - height;
   }
 
   void jump() {
-    if (dinoState != DinoState.running && dinoState != DinoState.ducking) return;
+    if (dinoState != DinoState.running) return;
     dinoState = DinoState.jumping;
     velocityY = GameConfig.jumpVelocity;
     _jumpHeld = true;
@@ -63,14 +57,12 @@ class Dino extends PositionComponent {
     if (dinoState == DinoState.jumping) {
       velocityY += GameConfig.gravity;
       y += velocityY;
-
       if (_jumpHeld) {
         _holdTime += dt;
-        if (_holdTime > 0.25) {
-          velocityY += GameConfig.gravity * 0.5;
+        if (_holdTime > 0.2) {
+          velocityY += GameConfig.gravity * 0.3;
         }
       }
-
       if (y >= GameConfig.groundY - height) {
         y = GameConfig.groundY - height;
         velocityY = 0;
@@ -79,33 +71,66 @@ class Dino extends PositionComponent {
     }
 
     if (dinoState == DinoState.running) {
-      _frameTimer += dt * 12;
+      _frameTimer += dt * 10;
       if (_frameTimer >= 1) {
         _frameTimer = 0;
-        _frameIndex = (_frameIndex + 1) % 8;
+        _frameIndex = (_frameIndex + 1) % 3;
       }
     }
   }
 
   @override
   void render(Canvas canvas) {
+    if (_useSprites) {
+      _renderSprites(canvas);
+    } else {
+      _renderFallback(canvas);
+    }
+  }
+
+  void _renderSprites(Canvas canvas) {
     Sprite? sprite;
     if (dinoState == DinoState.dead) {
       sprite = _dead;
     } else if (dinoState == DinoState.jumping) {
-      sprite = _run0;
+      sprite = _f0;
     } else {
-      sprite = [
-        _run0, _run1, _run2, _run3,
-        _run4, _run5, _run6, _run7,
-      ][_frameIndex];
+      sprite = [_f0, _f1, _f2][_frameIndex];
     }
-
     if (sprite != null) {
       sprite.render(canvas, size: size);
     } else {
-      final paint = Paint()..color = const Color(0xFF535353);
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
+      _renderFallback(canvas);
     }
+  }
+
+  void _renderFallback(Canvas canvas) {
+    final paint = Paint();
+    paint.color = const Color(0xFF535353);
+    canvas.drawRRect(
+      RRect.fromRectXY(Rect.fromLTWH(4, 4, 60, 64), 6, 6),
+      paint,
+    );
+    paint.color = const Color(0xFF6B6B6B);
+    canvas.drawRRect(
+      RRect.fromRectXY(Rect.fromLTWH(4, 4, 60, 30), 6, 4),
+      paint,
+    );
+    paint.color = const Color(0xFF222222);
+    canvas.drawCircle(const Offset(50, 20), 4, paint);
+    paint.color = const Color(0xFFFFFFFF);
+    canvas.drawCircle(const Offset(51, 19), 1.5, paint);
+    paint.color = const Color(0xFF424242);
+    canvas.drawRect(Rect.fromLTWH(6, 28, 10, 5), paint);
+
+    if (dinoState == DinoState.dead) {
+      paint.color = const Color(0xFFCC0000);
+      canvas.drawCircle(const Offset(50, 20), 4, paint);
+    }
+
+    paint.color = const Color(0xFF535353);
+    final legOff = (_frameIndex % 2 == 0) ? 0.0 : 4.0;
+    canvas.drawRect(Rect.fromLTWH(18, 64, 8, 8), paint);
+    canvas.drawRect(Rect.fromLTWH(40, 64 + legOff, 8, 8 - legOff), paint);
   }
 }

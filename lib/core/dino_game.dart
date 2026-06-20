@@ -34,17 +34,15 @@ class DinoGame extends FlameGame {
   Future<void> onLoad() async {
     if (_initialised) return;
     _initialised = true;
-
     _scoreSystem = ScoreSystem();
-    final groundSprite = await Sprite.load('images/dino/piso.png');
-    _ground = Ground(groundSprite);
-    _dino = Dino();
+    _ground = Ground();
     add(_ground);
+    _dino = Dino();
     add(_dino);
-    _spawnCloud();
     try {
       _logoSprite = await Sprite.load('images/dino/dino.png');
     } catch (_) {}
+    _spawnCloud();
   }
 
   void _spawnCloud() {
@@ -86,7 +84,7 @@ class DinoGame extends FlameGame {
     _spawnTimer = 1.5;
     removeAll(children);
 
-    _ground = Ground(null);
+    _ground = Ground();
     _dino = Dino();
     add(_ground);
     add(_dino);

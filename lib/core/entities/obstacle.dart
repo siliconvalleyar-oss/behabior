@@ -3,53 +3,42 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:behabior/core/config/game_config.dart';
 
-enum ObstacleType { cactusSingle, cactusDouble, pterodactyl }
+enum ObstacleType { cactus, cactusDouble, pterodactyl }
 
 class Obstacle extends PositionComponent {
   final ObstacleType type;
   bool passed = false;
-
-  Sprite? _sprite;
-  Sprite? _spriteDouble;
-  Sprite? _birdSprite;
 
   Obstacle({required this.type});
 
   factory Obstacle.random(double speed) {
     final rand = Random();
     final types = [
-      ObstacleType.cactusSingle,
-      ObstacleType.cactusSingle,
+      ObstacleType.cactus,
+      ObstacleType.cactus,
       ObstacleType.cactusDouble,
       if (speed > 8) ObstacleType.pterodactyl,
-      if (speed > 10) ObstacleType.pterodactyl,
+      if (speed > 11) ObstacleType.pterodactyl,
     ];
-    final type = types[rand.nextInt(types.length)];
-    return Obstacle(type: type);
+    return Obstacle(type: types[rand.nextInt(types.length)]);
   }
 
   @override
   Future<void> onLoad() async {
-    try {
-      _sprite = await Sprite.load('images/dino/un_cactus.png');
-      _spriteDouble = await Sprite.load('images/dino/dos_cactus.png');
-      _birdSprite = await Sprite.load('images/dino/ave.png');
-    } catch (_) {}
-
     switch (type) {
-      case ObstacleType.cactusSingle:
-        size.setValues(40, 70);
+      case ObstacleType.cactus:
+        size.setValues(28, 56);
         break;
       case ObstacleType.cactusDouble:
-        size.setValues(70, 70);
+        size.setValues(52, 56);
         break;
       case ObstacleType.pterodactyl:
-        size.setValues(60, 40);
+        size.setValues(50, 34);
         break;
     }
     y = GameConfig.groundY - height;
     if (type == ObstacleType.pterodactyl) {
-      y -= 30 + Random().nextDouble() * 20;
+      y -= 20 + Random().nextDouble() * 30;
     }
     x = GameConfig.worldWidth + 50;
   }
@@ -64,27 +53,74 @@ class Obstacle extends PositionComponent {
   void render(Canvas canvas) {
     final paint = Paint();
     switch (type) {
-      case ObstacleType.cactusSingle:
-        if (_sprite != null) {
-          _sprite!.render(canvas, size: size);
-        } else {
-          paint.color = const Color(0xFF4CAF50);
-          canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
-        }
+      case ObstacleType.cactus:
+        paint.color = const Color(0xFF4CAF50);
+        canvas.drawRRect(
+          RRect.fromRectXY(Rect.fromLTWH(2, 0, 24, 56), 4, 4),
+          paint,
+        );
+        paint.color = const Color(0xFF388E3C);
+        canvas.drawRect(Rect.fromLTWH(4, 12, 20, 3), paint);
+        canvas.drawRect(Rect.fromLTWH(4, 28, 20, 3), paint);
+        paint.color = const Color(0xFF66BB6A);
+        canvas.drawRect(Rect.fromLTWH(0, 16, 6, 5), paint);
+        canvas.drawRect(Rect.fromLTWH(22, 32, 6, 5), paint);
+
       case ObstacleType.cactusDouble:
-        if (_spriteDouble != null) {
-          _spriteDouble!.render(canvas, size: size);
-        } else {
-          paint.color = const Color(0xFF388E3C);
-          canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
-        }
+        paint.color = const Color(0xFF388E3C);
+        canvas.drawRRect(
+          RRect.fromRectXY(Rect.fromLTWH(2, 0, 22, 56), 4, 4),
+          paint,
+        );
+        canvas.drawRRect(
+          RRect.fromRectXY(Rect.fromLTWH(28, 0, 22, 50), 4, 4),
+          paint,
+        );
+        paint.color = const Color(0xFF2E7D32);
+        canvas.drawRect(Rect.fromLTWH(4, 12, 18, 3), paint);
+        canvas.drawRect(Rect.fromLTWH(4, 28, 18, 3), paint);
+        canvas.drawRect(Rect.fromLTWH(30, 10, 18, 3), paint);
+        canvas.drawRect(Rect.fromLTWH(30, 26, 18, 3), paint);
+        paint.color = const Color(0xFF66BB6A);
+        canvas.drawRect(Rect.fromLTWH(0, 16, 6, 5), paint);
+        canvas.drawRect(Rect.fromLTWH(24, 32, 6, 5), paint);
+
       case ObstacleType.pterodactyl:
-        if (_birdSprite != null) {
-          _birdSprite!.render(canvas, size: size);
+        paint.color = const Color(0xFF757575);
+        canvas.drawRRect(
+          RRect.fromRectXY(Rect.fromLTWH(0, 6, 50, 22), 6, 6),
+          paint,
+        );
+        paint.color = const Color(0xFF9E9E9E);
+        canvas.drawRect(Rect.fromLTWH(2, 6, 46, 22), paint);
+
+        final wingUp = (DateTime.now().millisecondsSinceEpoch ~/ 200).isEven;
+        final wingPath = Path();
+        if (wingUp) {
+          wingPath.moveTo(12, 6);
+          wingPath.lineTo(26, -12);
+          wingPath.lineTo(38, 6);
         } else {
-          paint.color = const Color(0xFF757575);
-          canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), paint);
+          wingPath.moveTo(12, 6);
+          wingPath.lineTo(26, -4);
+          wingPath.lineTo(38, 6);
         }
+        wingPath.close();
+        paint.color = const Color(0xFF9E9E9E);
+        canvas.drawPath(wingPath, paint);
+
+        paint.color = const Color(0xFFFFCC00);
+        canvas.drawCircle(const Offset(8, 16), 3, paint);
+        paint.color = const Color(0xFF222222);
+        canvas.drawCircle(const Offset(8, 16), 1.5, paint);
+
+        paint.color = const Color(0xFFFF6600);
+        final beak = Path()
+          ..moveTo(0, 16)
+          ..lineTo(-6, 14)
+          ..lineTo(-6, 18)
+          ..close();
+        canvas.drawPath(beak, paint);
     }
   }
 }

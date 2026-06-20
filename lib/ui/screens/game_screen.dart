@@ -30,22 +30,14 @@ class _GameScreenState extends State<GameScreen> {
     super.dispose();
   }
 
-  void _onTap() {
-    _game.handleTap();
-  }
-
-  void _onTapCancel() {
-    _game.handleRelease();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
       body: SafeArea(
-        child: GestureDetector(
-          onTap: _onTap,
-          onTapCancel: _onTapCancel,
+        child: Listener(
+          onPointerDown: (_) => _game.handleTap(),
+          onPointerUp: (_) => _game.handleRelease(),
           child: GameWidget(
             game: _game,
           ),
