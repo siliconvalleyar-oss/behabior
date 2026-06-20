@@ -1,5 +1,7 @@
-import 'dart:math';
+import 'dart:math' show atan2, min, pi;
+import 'dart:ui' show Canvas, Paint;
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
@@ -11,18 +13,17 @@ class Player extends BaseEntity {
   double _attackTimer = 0.0;
   bool canMove = true;
 
-  // Invincibility frames
   double _invincibilityTimer = 0.0;
   static const double invincibilityDuration = 1.0;
   bool get isInvincible => _invincibilityTimer > 0;
 
-  // Skills modifiers
   double damageMultiplier = 1.0;
   double speedMultiplier = 1.0;
   double healthMultiplier = 1.0;
 
-  // Callbacks
   void Function(Projectile projectile)? onShoot;
+
+  late final Sprite _sprite;
 
   Player({
     Vector2? position,
@@ -44,14 +45,18 @@ class Player extends BaseEntity {
 
   void applySkillModifiers(double healthBonus, double speedBonus, double damageBonus) {
     maxHealth = GameConfig.playerMaxHealth + healthBonus;
-    health = maxHealth; // full heal on skill apply
+    health = maxHealth;
     speedMultiplier = 1.0 + (speedBonus / GameConfig.playerSpeed);
     damageMultiplier = 1.0 + (damageBonus / 25.0);
   }
 
   @override
+  Future<void> onLoad() async {
+    _sprite = await Sprite.load('naves/nave_00.png');
+  }
+
+  @override
   void updatePhysics(double dt) {
-    // Movement
     if (canMove && _moveDirection.length > 0.1) {
       final effectiveSpeed = speed * speedMultiplier;
       position += _moveDirection * effectiveSpeed * dt;
@@ -60,20 +65,21 @@ class Player extends BaseEntity {
       state = EntityState.idle;
     }
 
-    // Clamp to world bounds
     position.setValues(
       position.x.clamp(hitboxRadius, GameConfig.worldWidth - hitboxRadius),
       position.y.clamp(hitboxRadius, GameConfig.worldHeight - hitboxRadius),
     );
 
-    // Attack timer
     if (_attackTimer > 0) {
       _attackTimer -= dt;
     }
 
-    // Invincibility
     if (_invincibilityTimer > 0) {
       _invincibilityTimer -= dt;
+    }
+
+    if (_moveDirection.length > 0.1) {
+      angle = atan2(_moveDirection.y, _moveDirection.x) + pi / 2;
     }
   }
 
@@ -113,5 +119,20 @@ class Player extends BaseEntity {
     state = EntityState.idle;
     _moveDirection = Vector2.zero();
     _attackTimer = 0.0;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final spriteSize = _sprite.srcSize;
+    final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
+    final scaled = spriteSize * scale;
+    final offset = (size - scaled) / 2;
+
+    final paint = Paint();
+    if (isInvincible) {
+      paint.color = Colors.white.withOpacity(0.5);
+    }
+
+    _sprite.render(canvas, position: offset, size: scaled, overridePaint: paint);
   }
 }

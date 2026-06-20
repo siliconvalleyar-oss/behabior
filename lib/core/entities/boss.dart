@@ -1,5 +1,7 @@
-import 'dart:math';
+import 'dart:math' show atan2, min, pi;
+import 'dart:ui' show Canvas, Paint, ColorFilter, BlendMode;
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
@@ -15,17 +17,17 @@ class Boss extends BaseEntity {
   Vector2? _targetPosition;
   double _rageThreshold = 0.3;
 
-  // Boss-specific stats
   double phase2HealthPercent = 0.6;
   double phase3HealthPercent = 0.3;
   double specialAttackCooldown = 5.0;
   double attackRange = 80.0;
   bool _isEnraged = false;
 
-  // Callbacks
   void Function(Boss boss)? onDeath;
   void Function(Vector2 position, Vector2 direction, String attackType)? onAttack;
   void Function(Boss boss, BossPhase newPhase)? onPhaseChange;
+
+  late final Sprite _sprite;
 
   Boss({
     required this.bossType,
@@ -43,13 +45,17 @@ class Boss extends BaseEntity {
         );
 
   @override
+  Future<void> onLoad() async {
+    _sprite = await Sprite.load('naves/enemy_02.png');
+  }
+
+  @override
   void updatePhysics(double dt) {
     if (isDead) return;
 
     _attackTimer += dt;
     _specialAttackTimer += dt;
 
-    // Phase transitions
     final hpPercent = healthPercent;
     if (hpPercent <= _rageThreshold && !_isEnraged) {
       _enterPhase(BossPhase.enraged);
@@ -59,7 +65,6 @@ class Boss extends BaseEntity {
       _enterPhase(BossPhase.phase2);
     }
 
-    // AI
     if (_targetPosition != null) {
       final dist = distanceTo(_targetPosition!);
       if (dist > attackRange) {
@@ -67,6 +72,11 @@ class Boss extends BaseEntity {
       } else if (_attackTimer >= _getAttackCooldown()) {
         _attackTimer = 0.0;
         _executeAttack();
+      }
+
+      if (dist > 1) {
+        final dir = _targetPosition! - position;
+        angle = atan2(dir.y, dir.x) + pi / 2;
       }
     }
   }
@@ -128,13 +138,11 @@ class Boss extends BaseEntity {
   @override
   void takeDamage(double amount, {Vector2? from}) {
     super.takeDamage(amount, from: from);
-    // Brief speed boost when hit (aggro)
     speed = min(speed * 1.1, 200.0);
   }
 
   @override
   void onCollision(CollisionInfo info) {
-    // Boss collisions handled via attack system
   }
 
   @override
@@ -145,4 +153,19 @@ class Boss extends BaseEntity {
 
   BossPhase get phase => _phase;
   bool get isEnraged => _isEnraged;
+
+  @override
+  void render(Canvas canvas) {
+    final spriteSize = _sprite.srcSize;
+    final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
+    final scaled = spriteSize * scale;
+    final offset = (size - scaled) / 2;
+
+    final paint = Paint();
+    if (_isEnraged) {
+      paint.colorFilter = ColorFilter.mode(Colors.red, BlendMode.srcATop);
+    }
+
+    _sprite.render(canvas, position: offset, size: scaled, overridePaint: paint);
+  }
 }

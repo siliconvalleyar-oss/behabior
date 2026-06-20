@@ -1,6 +1,6 @@
+import 'dart:math' show atan2, min, pi;
 import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:vector_math/vector_math.dart' hide Colors;
 import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
 import 'package:behabior/core/engine/collision_system.dart';
@@ -12,9 +12,10 @@ class Projectile extends BaseEntity {
   double _age = 0.0;
   bool hasHit = false;
 
-  // Callbacks
   void Function(Projectile projectile)? onHit;
   void Function(Projectile projectile)? onExpire;
+
+  late final Sprite _sprite;
 
   Projectile({
     Vector2? position,
@@ -33,6 +34,17 @@ class Projectile extends BaseEntity {
           damage: damage ?? 10.0,
           size: Vector2(size ?? GameConfig.projectileSize, size ?? GameConfig.projectileSize),
         );
+
+  String get _spritePath {
+    return team == EntityTeam.player
+        ? 'naves/disparo_de_nave_00.png'
+        : 'naves/disparo_de_nave_01.png';
+  }
+
+  @override
+  Future<void> onLoad() async {
+    _sprite = await Sprite.load(_spritePath);
+  }
 
   @override
   void updatePhysics(double dt) {
@@ -53,6 +65,8 @@ class Projectile extends BaseEntity {
       hasHit = true;
       removeFromParent();
     }
+
+    angle = atan2(direction.y, direction.x) + pi / 2;
   }
 
   @override
@@ -66,5 +80,15 @@ class Projectile extends BaseEntity {
       onHit?.call(this);
       removeFromParent();
     }
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final spriteSize = _sprite.srcSize;
+    final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
+    final scaled = spriteSize * scale;
+    final offset = (size - scaled) / 2;
+
+    _sprite.render(canvas, position: offset, size: scaled);
   }
 }

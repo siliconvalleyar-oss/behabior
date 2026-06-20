@@ -36,4 +36,5 @@ flutter:
     - assets/images/sprites/
     - assets/images/backgrounds/
     - assets/images/ui/
+    - assets/images/naves/
     - assets/fonts/

@@ -1,4 +1,5 @@
-import 'dart:math';
+import 'dart:math' show atan2, min, pi;
+import 'dart:ui' show Canvas, Paint;
 import 'package:flame/components.dart';
 import 'package:behabior/core/entities/base_entity.dart';
 import 'package:behabior/core/config/game_config.dart';
@@ -11,13 +12,13 @@ class Enemy extends BaseEntity {
   double _attackCooldownTimer = 0.0;
   bool _hasDealtCollisionDamage = false;
 
-  // AI state
   Vector2? _targetPosition;
   bool _isRanged = false;
 
-  // Callbacks
   void Function(Enemy enemy)? onDeath;
   void Function(Vector2 position, Vector2 direction)? onRangedAttack;
+
+  late final Sprite _sprite;
 
   Enemy({
     required this.model,
@@ -36,6 +37,28 @@ class Enemy extends BaseEntity {
     _isRanged = model.projectileType != null;
   }
 
+  String get _spritePath {
+    switch (model.type) {
+      case EnemyType.basic:
+        return 'naves/enemy_00.png';
+      case EnemyType.fast:
+        return 'naves/enemy_01.png';
+      case EnemyType.tank:
+        return 'naves/enemy_02.png';
+      case EnemyType.ranged:
+        return 'naves/enemy_02.png';
+      case EnemyType.healer:
+        return 'naves/enemy_00.png';
+      case EnemyType.explosive:
+        return 'naves/enemy_02.png';
+    }
+  }
+
+  @override
+  Future<void> onLoad() async {
+    _sprite = await Sprite.load(_spritePath);
+  }
+
   void setTarget(Vector2 target) {
     _targetPosition = target;
   }
@@ -44,16 +67,13 @@ class Enemy extends BaseEntity {
   void updatePhysics(double dt) {
     if (isDead) return;
 
-    // Cooldown
     if (_attackCooldownTimer > 0) {
       _attackCooldownTimer -= dt;
     }
 
-    // AI behavior
     if (_targetPosition != null) {
       final dist = distanceTo(_targetPosition!);
       if (_isRanged && dist <= attackRange) {
-        // Ranged attack
         state = EntityState.attacking;
         if (_attackCooldownTimer <= 0) {
           _attackCooldownTimer = model.attackCooldown;
@@ -61,14 +81,17 @@ class Enemy extends BaseEntity {
           onRangedAttack?.call(position.clone(), dir);
         }
       } else if (dist > hitboxRadius + 5) {
-        // Move toward target
         moveToward(_targetPosition!, dt);
       } else {
-        // Melee range
         state = EntityState.attacking;
         if (_attackCooldownTimer <= 0) {
           _attackCooldownTimer = model.attackCooldown;
         }
+      }
+
+      if (dist > 1) {
+        final dir = _targetPosition! - position;
+        angle = atan2(dir.y, dir.x) + pi / 2;
       }
     }
   }
@@ -77,7 +100,6 @@ class Enemy extends BaseEntity {
   void onCollision(CollisionInfo info) {
     if (info.layerB == CollisionLayer.player && !_hasDealtCollisionDamage) {
       _hasDealtCollisionDamage = true;
-      // Damage dealt via collision system
     }
   }
 
@@ -89,5 +111,16 @@ class Enemy extends BaseEntity {
 
   void resetCollisionFlag() {
     _hasDealtCollisionDamage = false;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final spriteSize = _sprite.srcSize;
+    final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
+    final scaled = spriteSize * scale;
+    final offset = (size - scaled) / 2;
+
+    final paint = Paint();
+    _sprite.render(canvas, position: offset, size: scaled, overridePaint: paint);
   }
 }
