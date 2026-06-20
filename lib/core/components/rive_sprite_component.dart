@@ -35,19 +35,25 @@ class RiveSpriteComponent extends PositionComponent {
         _assetPath,
         riveFactory: rive.Factory.rive,
       );
-      if (file == null) return;
+      if (file == null) {
+        _artboardLoaded = false;
+        return;
+      }
       _artboard = _artboardName != null
           ? file.artboard(_artboardName!)
           : file.defaultArtboard();
-      if (_artboard == null) return;
+      if (_artboard == null) {
+        _artboardLoaded = false;
+        return;
+      }
 
       _stateMachine = _stateMachineName != null
           ? _artboard!.stateMachine(_stateMachineName!)
           : _artboard!.defaultStateMachine();
       if (_stateMachine != null) {
         _setupInputs();
-        _artboard!.advance(0);
       }
+      _artboard!.advance(0);
       _artboardLoaded = true;
     } catch (e) {
       _artboardLoaded = false;
@@ -94,32 +100,36 @@ class RiveSpriteComponent extends PositionComponent {
   @override
   void render(Canvas canvas) {
     if (_artboard == null || !_artboardLoaded) return;
-    final renderer = rive.Renderer.make(canvas);
     try {
-      final s = size.isZero() ? Vector2(100, 100) : size;
-      final frame = rive.AABB.fromValues(0, 0, s.x, s.y);
-      renderer.align(
-        rive.Fit.contain,
-        Alignment.center,
-        frame,
-        _artboard!.bounds,
-        1.0,
-      );
-      _artboard!.draw(renderer);
-    } finally {
-      renderer.dispose();
-    }
+      final renderer = rive.Renderer.make(canvas);
+      try {
+        final s = size.isZero() ? Vector2(100, 100) : size;
+        final frame = rive.AABB.fromValues(0, 0, s.x, s.y);
+        renderer.align(
+          rive.Fit.contain,
+          Alignment.center,
+          frame,
+          _artboard!.bounds,
+          1.0,
+        );
+        _artboard!.draw(renderer);
+      } finally {
+        renderer.dispose();
+      }
+    } catch (_) {}
   }
 
   @override
   void update(double dt) {
     super.update(dt);
     if (_artboard != null && _artboardLoaded) {
-      if (_stateMachine != null) {
-        _stateMachine!.advanceAndApply(dt);
-      } else {
-        _artboard!.advance(dt);
-      }
+      try {
+        if (_stateMachine != null) {
+          _stateMachine!.advanceAndApply(dt);
+        } else {
+          _artboard!.advance(dt);
+        }
+      } catch (_) {}
     }
   }
 

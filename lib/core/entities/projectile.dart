@@ -35,15 +35,35 @@ class Projectile extends BaseEntity {
           size: Vector2(size ?? GameConfig.projectileSize, size ?? GameConfig.projectileSize),
         );
 
-  String get _spritePath {
-    return team == EntityTeam.player
-        ? 'naves/disparo_de_nave_00.png'
-        : 'naves/disparo_de_nave_01.png';
-  }
+  String get _spritePath => '';
 
   @override
   Future<void> onLoad() async {
-    _sprite = await Sprite.load(_spritePath);
+    final path = team == EntityTeam.player
+        ? 'assets/images/naves/disparo_de_nave_00.png'
+        : 'assets/images/naves/disparo_de_nave_01.png';
+    try {
+      _sprite = await Sprite.load(path);
+    } catch (e) {
+      try {
+        final fallback = team == EntityTeam.player
+            ? 'images/naves/disparo_de_nave_00.png'
+            : 'images/naves/disparo_de_nave_01.png';
+        _sprite = await Sprite.load(fallback);
+      } catch (_) {
+        _sprite = Sprite(await _createPlaceholderImage());
+      }
+    }
+  }
+
+  Future<Image> _createPlaceholderImage() async {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    final paint = Paint()..color = team == EntityTeam.player ? Color(0xFF00FF00) : Color(0xFFFF0000);
+    canvas.drawCircle(const Offset(4, 4), 4, paint);
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(8, 8);
+    return img;
   }
 
   @override

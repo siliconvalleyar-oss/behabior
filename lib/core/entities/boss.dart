@@ -48,16 +48,25 @@ class Boss extends BaseEntity {
 
   @override
   Future<void> onLoad() async {
-    _sprite = await Sprite.load('naves/enemy_02.png');
-    final rive = RiveSpriteComponent(
-      assetPath: 'animations/spaceship.riv',
-      size: size * 0.6,
-    )..anchor = Anchor.center;
-    await rive.load();
-    if (rive.isLoaded) {
-      _riveComponent = rive;
-      add(rive);
+    try {
+      _sprite = await Sprite.load('assets/images/naves/enemy_02.png');
+    } catch (_) {
+      try {
+        _sprite = await Sprite.load('images/naves/enemy_02.png');
+      } catch (_) {}
     }
+    try {
+      final rive = RiveSpriteComponent(
+        assetPath: 'assets/animations/character.riv',
+        size: size,
+        position: size / 2,
+      )..anchor = Anchor.center;
+      await rive.load();
+      if (rive.isLoaded) {
+        _riveComponent = rive;
+        add(rive);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -167,7 +176,6 @@ class Boss extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
-    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;

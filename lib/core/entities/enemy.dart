@@ -42,17 +42,17 @@ class Enemy extends BaseEntity {
   String get _spritePath {
     switch (model.type) {
       case EnemyType.basic:
-        return 'naves/enemy_00.png';
+        return 'assets/images/naves/enemy_00.png';
       case EnemyType.fast:
-        return 'naves/enemy_01.png';
+        return 'assets/images/naves/enemy_01.png';
       case EnemyType.tank:
-        return 'naves/enemy_02.png';
+        return 'assets/images/naves/enemy_02.png';
       case EnemyType.ranged:
-        return 'naves/enemy_02.png';
+        return 'assets/images/naves/enemy_02.png';
       case EnemyType.healer:
-        return 'naves/enemy_00.png';
+        return 'assets/images/naves/enemy_00.png';
       case EnemyType.explosive:
-        return 'naves/enemy_02.png';
+        return 'assets/images/naves/enemy_02.png';
     }
   }
 
@@ -60,28 +60,30 @@ class Enemy extends BaseEntity {
     switch (model.type) {
       case EnemyType.basic:
       case EnemyType.healer:
-        return 'animations/centaur.riv';
       case EnemyType.fast:
-        return 'animations/stasher.riv';
+        return 'assets/animations/stasher.riv';
       case EnemyType.tank:
       case EnemyType.ranged:
       case EnemyType.explosive:
-        return 'animations/character.riv';
+        return 'assets/animations/centaur.riv';
     }
   }
 
   @override
   Future<void> onLoad() async {
     _sprite = await Sprite.load(_spritePath);
-    final rive = RiveSpriteComponent(
-      assetPath: _riveAssetPath,
-      size: size * 0.8,
-    )..anchor = Anchor.center;
-    await rive.load();
-    if (rive.isLoaded) {
-      _riveComponent = rive;
-      add(rive);
-    }
+    try {
+      final rive = RiveSpriteComponent(
+        assetPath: _riveAssetPath,
+        size: size,
+        position: size / 2,
+      )..anchor = Anchor.center;
+      await rive.load();
+      if (rive.isLoaded) {
+        _riveComponent = rive;
+        add(rive);
+      }
+    } catch (_) {}
   }
 
   void setTarget(Vector2 target) {
@@ -140,7 +142,6 @@ class Enemy extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
-    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;

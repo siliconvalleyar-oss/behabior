@@ -54,18 +54,23 @@ class Player extends BaseEntity {
 
   @override
   Future<void> onLoad() async {
-    _sprite = await Sprite.load('naves/nave_00.png');
-    final rive = RiveSpriteComponent(
-      assetPath: 'animations/ship_gamekit.riv',
-      artboardName: 'large scene',
-      stateMachineName: 'State Machine 1',
-      size: size * 0.5,
-    )..anchor = Anchor.center;
-    await rive.load();
-    if (rive.isLoaded) {
-      _riveComponent = rive;
-      add(rive);
+    try {
+      _sprite = await Sprite.load('assets/images/naves/nave_00.png');
+    } catch (_) {
+      _sprite = await Sprite.load('images/naves/nave_00.png');
     }
+    try {
+      final rive = RiveSpriteComponent(
+        assetPath: 'assets/animations/centaur.riv',
+        size: size,
+        position: size / 2,
+      )..anchor = Anchor.center;
+      await rive.load();
+      if (rive.isLoaded) {
+        _riveComponent = rive;
+        add(rive);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -155,7 +160,6 @@ class Player extends BaseEntity {
 
   @override
   void render(Canvas canvas) {
-    if (_riveComponent != null && _riveComponent!.isLoaded) return;
     final spriteSize = _sprite.srcSize;
     final scale = min(size.x / spriteSize.x, size.y / spriteSize.y);
     final scaled = spriteSize * scale;
