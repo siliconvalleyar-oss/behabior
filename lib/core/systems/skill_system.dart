@@ -29,12 +29,10 @@ class SkillSystem extends ChangeNotifier {
 
   bool unlockSkill(String skillId) {
     if (!canUnlock(skillId)) return false;
-    final success = _gameState.upgradeSkill(skillId);
-    if (success) {
-      _lastActivatedSkill = skillId;
-      notifyListeners();
-    }
-    return success;
+    _gameState.upgradeSkill(skillId);
+    _lastActivatedSkill = skillId;
+    notifyListeners();
+    return true;
   }
 
   // Get computed stat bonuses
