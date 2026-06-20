@@ -16,17 +16,17 @@ class Dino extends PositionComponent {
   Sprite? _f0;
   Sprite? _f1;
   Sprite? _f2;
-  Sprite? _dead;
+  Sprite? _f3;
 
   Dino() : super(size: Vector2(68, 72));
 
   @override
   Future<void> onLoad() async {
     try {
-      _f0 = await Sprite.load('images/dino/dino_move_00.png');
-      _f1 = await Sprite.load('images/dino/dino_move_01.png');
-      _f2 = await Sprite.load('images/dino/dino_move_02.png');
-      _dead = await Sprite.load('images/dino/dino_08.png');
+      _f0 = await Sprite.load('images/dino/dino_run_00.png');
+      _f1 = await Sprite.load('images/dino/dino_run_01.png');
+      _f2 = await Sprite.load('images/dino/dino_run_02.png');
+      _f3 = await Sprite.load('images/dino/dino_run_03.png');
       _useSprites = true;
     } catch (_) {
       _useSprites = false;
@@ -74,7 +74,7 @@ class Dino extends PositionComponent {
       _frameTimer += dt * 10;
       if (_frameTimer >= 1) {
         _frameTimer = 0;
-        _frameIndex = (_frameIndex + 1) % 3;
+        _frameIndex = (_frameIndex + 1) % 4;
       }
     }
   }
@@ -90,12 +90,10 @@ class Dino extends PositionComponent {
 
   void _renderSprites(Canvas canvas) {
     Sprite? sprite;
-    if (dinoState == DinoState.dead) {
-      sprite = _dead;
-    } else if (dinoState == DinoState.jumping) {
+    if (dinoState == DinoState.dead || dinoState == DinoState.jumping) {
       sprite = _f0;
     } else {
-      sprite = [_f0, _f1, _f2][_frameIndex];
+      sprite = [_f0, _f1, _f2, _f3][_frameIndex];
     }
     if (sprite != null) {
       sprite.render(canvas, size: size);

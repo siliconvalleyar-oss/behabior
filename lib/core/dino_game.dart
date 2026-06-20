@@ -21,7 +21,6 @@ class DinoGame extends FlameGame {
   bool _started = false;
   final Random _random = Random();
   bool _initialised = false;
-  Sprite? _logoSprite;
 
   bool get gameStarted => _started;
   bool get gameOver => _gameOver;
@@ -39,9 +38,6 @@ class DinoGame extends FlameGame {
     add(_ground);
     _dino = Dino();
     add(_dino);
-    try {
-      _logoSprite = await Sprite.load('images/dino/dino.png');
-    } catch (_) {}
     _spawnCloud();
   }
 
@@ -196,14 +192,6 @@ class DinoGame extends FlameGame {
     }
 
     if (!_started) {
-      if (_logoSprite != null) {
-        final logoSize = Vector2(120, 67);
-        _logoSprite!.render(
-          canvas,
-          position: Vector2((size.x - logoSize.x) / 2, size.y / 2 - logoSize.y - 30),
-          size: logoSize,
-        );
-      }
       final tap = TextPainter(
         text: TextSpan(text: 'TAP TO START', style: textStyle.copyWith(fontSize: 26)),
         textDirection: TextDirection.ltr,
