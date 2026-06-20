@@ -35,10 +35,5 @@ Thumbs.db
 **/*.g.dart
 **/*.freezed.dart
 
-# Assets (large binary files)
-assets/animations/*.riv
-assets/audio/music/*.mp3
-assets/audio/sfx/*.wav
-
 # APK output
 /APK/
