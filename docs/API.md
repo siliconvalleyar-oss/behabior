@@ -56,3 +56,15 @@ class ScoreSystem {
   void checkHighScore();
 }
 ```
+
+### `AudioSystem`
+
+```dart
+class AudioSystem {
+  static Future<void> init();  // Preload all sounds
+  static void jump();          // Play jump sound
+  static void death();         // Play death sound
+  static void score();         // Play score point sound
+  static void milestone();     // Play milestone sound (every 100pts)
+}
+```

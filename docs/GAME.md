@@ -6,8 +6,9 @@ Chrome Dino-style endless runner built with Flutter & Flame Engine.
 
 - **Endless runner** — auto-scrolling with progressive speed
 - **One-tap controls** — tap to jump, hold for higher jump
-- **Obstacles** — single cacti, double cacti, pterodactyls
+- **Obstacles** — single cacti, double cacti, pterodactyls (sprite: `ave.png`)
 - **Score** — increases over time, +10 per obstacle passed
+- **Sound effects** — jump, death, score point, milestone arpeggio (every 100pts)
 - **High score** — persisted in memory per session
 - **Game over** — collision kills the dino, tap to restart
 

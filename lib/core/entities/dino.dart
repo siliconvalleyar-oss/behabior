@@ -17,6 +17,7 @@ class Dino extends PositionComponent {
   Sprite? _f1;
   Sprite? _f2;
   Sprite? _f3;
+  final List<Vector2> _spriteSizes = [];
 
   Dino() : super(size: Vector2(68, 72));
 
@@ -28,6 +29,18 @@ class Dino extends PositionComponent {
       _f2 = await Sprite.load('dino/dino_run_02.png');
       _f3 = await Sprite.load('dino/dino_run_03.png');
       _useSprites = true;
+      for (final s in [_f0, _f1, _f2, _f3]) {
+        if (s != null) {
+          _spriteSizes.add(s.srcSize.clone());
+        }
+      }
+      double maxW = 68;
+      double maxH = 72;
+      for (final v in _spriteSizes) {
+        if (v.x > maxW) maxW = v.x;
+        if (v.y > maxH) maxH = v.y;
+      }
+      size.setValues(maxW, maxH);
     } catch (_) {
       _useSprites = false;
     }
@@ -96,7 +109,8 @@ class Dino extends PositionComponent {
       sprite = [_f0, _f1, _f2, _f3][_frameIndex];
     }
     if (sprite != null) {
-      sprite.render(canvas, size: size);
+      final srcSize = sprite.srcSize;
+      sprite.render(canvas, size: srcSize);
     } else {
       _renderFallback(canvas);
     }

@@ -30,3 +30,10 @@
 ### `ScoreSystem` (`lib/core/systems/score_system.dart`)
 - Score, high score, speed tracking
 - Speed increases progressively from 6.0 to 18.0
+
+### `AudioSystem` (`lib/core/systems/audio_system.dart`)
+- Static class wrapping `FlameAudio`
+- Preloads all 4 .wav files on init
+- Silent failure if audio can't load
+- Methods: `jump()`, `death()`, `score()`, `milestone()`
+- Milestone plays every 100 points (ascending arpeggio)

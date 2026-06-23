@@ -7,10 +7,10 @@ A minimalist Chrome Dino-inspired runner where the player controls a pixel-art d
 ## Core Loop
 
 1. Game starts with "TAP TO START" screen
-2. Tap → dino begins running, obstacles spawn
+2. Tap → dino begins running, obstacles spawn (jump sound)
 3. Avoid obstacles by jumping (tap/hold for height)
-4. Score increases over time, speed ramps up
-5. Collision → game over with score + high score
+4. Score increases over time, speed ramps up (score sounds)
+5. Collision → game over with score + high score (death sound)
 6. Tap → restart
 
 ## Design Pillars

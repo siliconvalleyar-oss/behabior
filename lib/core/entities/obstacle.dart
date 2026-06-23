@@ -8,6 +8,7 @@ enum ObstacleType { cactus, cactusDouble, pterodactyl }
 class Obstacle extends PositionComponent {
   final ObstacleType type;
   bool passed = false;
+  Sprite? _aveSprite;
 
   Obstacle({required this.type});
 
@@ -33,7 +34,12 @@ class Obstacle extends PositionComponent {
         size.setValues(52, 56);
         break;
       case ObstacleType.pterodactyl:
-        size.setValues(50, 34);
+        size.setValues(60, 40);
+        try {
+          _aveSprite = await Sprite.load('dino/ave.png');
+        } catch (_) {
+          _aveSprite = null;
+        }
         break;
     }
     y = GameConfig.groundY - height;
@@ -86,41 +92,45 @@ class Obstacle extends PositionComponent {
         canvas.drawRect(Rect.fromLTWH(24, 32, 6, 5), paint);
 
       case ObstacleType.pterodactyl:
-        paint.color = const Color(0xFF757575);
-        canvas.drawRRect(
-          RRect.fromRectXY(Rect.fromLTWH(0, 6, 50, 22), 6, 6),
-          paint,
-        );
-        paint.color = const Color(0xFF9E9E9E);
-        canvas.drawRect(Rect.fromLTWH(2, 6, 46, 22), paint);
-
-        final wingUp = (DateTime.now().millisecondsSinceEpoch ~/ 200).isEven;
-        final wingPath = Path();
-        if (wingUp) {
-          wingPath.moveTo(12, 6);
-          wingPath.lineTo(26, -12);
-          wingPath.lineTo(38, 6);
+        if (_aveSprite != null) {
+          _aveSprite!.render(canvas, size: size);
         } else {
-          wingPath.moveTo(12, 6);
-          wingPath.lineTo(26, -4);
-          wingPath.lineTo(38, 6);
+          paint.color = const Color(0xFF757575);
+          canvas.drawRRect(
+            RRect.fromRectXY(Rect.fromLTWH(0, 6, 60, 28), 6, 6),
+            paint,
+          );
+          paint.color = const Color(0xFF9E9E9E);
+          canvas.drawRect(Rect.fromLTWH(2, 6, 56, 28), paint);
+
+          final wingUp = (DateTime.now().millisecondsSinceEpoch ~/ 200).isEven;
+          final wingPath = Path();
+          if (wingUp) {
+            wingPath.moveTo(12, 6);
+            wingPath.lineTo(26, -12);
+            wingPath.lineTo(38, 6);
+          } else {
+            wingPath.moveTo(12, 6);
+            wingPath.lineTo(26, -4);
+            wingPath.lineTo(38, 6);
+          }
+          wingPath.close();
+          paint.color = const Color(0xFF9E9E9E);
+          canvas.drawPath(wingPath, paint);
+
+          paint.color = const Color(0xFFFFCC00);
+          canvas.drawCircle(const Offset(8, 16), 3, paint);
+          paint.color = const Color(0xFF222222);
+          canvas.drawCircle(const Offset(8, 16), 1.5, paint);
+
+          paint.color = const Color(0xFFFF6600);
+          final beak = Path()
+            ..moveTo(0, 16)
+            ..lineTo(-6, 14)
+            ..lineTo(-6, 18)
+            ..close();
+          canvas.drawPath(beak, paint);
         }
-        wingPath.close();
-        paint.color = const Color(0xFF9E9E9E);
-        canvas.drawPath(wingPath, paint);
-
-        paint.color = const Color(0xFFFFCC00);
-        canvas.drawCircle(const Offset(8, 16), 3, paint);
-        paint.color = const Color(0xFF222222);
-        canvas.drawCircle(const Offset(8, 16), 1.5, paint);
-
-        paint.color = const Color(0xFFFF6600);
-        final beak = Path()
-          ..moveTo(0, 16)
-          ..lineTo(-6, 14)
-          ..lineTo(-6, 18)
-          ..close();
-        canvas.drawPath(beak, paint);
     }
   }
 }

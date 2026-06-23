@@ -9,6 +9,7 @@ import 'package:behabior/core/entities/obstacle.dart';
 import 'package:behabior/core/entities/ground.dart';
 import 'package:behabior/core/entities/cloud.dart';
 import 'package:behabior/core/systems/score_system.dart';
+import 'package:behabior/core/systems/audio_system.dart';
 
 class DinoGame extends FlameGame {
   late Dino _dino;
@@ -21,6 +22,7 @@ class DinoGame extends FlameGame {
   bool _started = false;
   final Random _random = Random();
   bool _initialised = false;
+  int _lastMilestone = 0;
 
   bool get gameStarted => _started;
   bool get gameOver => _gameOver;
@@ -64,6 +66,7 @@ class DinoGame extends FlameGame {
       return;
     }
     _dino.jump();
+    AudioSystem.jump();
   }
 
   void handleRelease() {
@@ -78,6 +81,7 @@ class DinoGame extends FlameGame {
     _obstacles.clear();
     _clouds.clear();
     _spawnTimer = 1.5;
+    _lastMilestone = 0;
     removeAll(children);
 
     _ground = Ground();
@@ -135,29 +139,36 @@ class DinoGame extends FlameGame {
       if (!o.passed && o.x + o.width < GameConfig.dinoX) {
         o.passed = true;
         _scoreSystem.score += 10;
+        AudioSystem.score();
+        final currentMilestone = _scoreSystem.score ~/ 100;
+        if (currentMilestone > _lastMilestone) {
+          _lastMilestone = currentMilestone;
+          AudioSystem.milestone();
+        }
       }
     }
   }
 
   void _checkCollisions() {
     final dinoBox = Rect.fromLTWH(
-      _dino.x + 10,
-      _dino.y + 8,
-      _dino.width - 20,
-      _dino.height - 12,
+      _dino.x + 14,
+      _dino.y + 10,
+      _dino.width - 28,
+      _dino.height - 20,
     );
 
     for (final o in _obstacles) {
       final obsBox = Rect.fromLTWH(
-        o.x + 6,
-        o.y + 6,
-        o.width - 12,
-        o.height - 12,
+        o.x + 8,
+        o.y + 8,
+        o.width - 16,
+        o.height - 16,
       );
       if (dinoBox.overlaps(obsBox)) {
         _gameOver = true;
         _dino.die();
         _scoreSystem.checkHighScore();
+        AudioSystem.death();
         break;
       }
     }

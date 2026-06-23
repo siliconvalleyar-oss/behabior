@@ -7,8 +7,9 @@ Chrome Dino-style endless runner built with **Flutter** & **Flame Engine** for A
 ## Gameplay
 
 - Tap to jump, hold for higher jump
-- Avoid cacti and pterodactyls
+- Avoid cacti and pterodactyls (with sprite `ave.png`)
 - Progressive speed as score increases
+- Sound effects: jump, death, score, milestone (every 100pts)
 - Game over on collision, tap to restart
 - High score tracked via ScoreSystem
 
@@ -17,7 +18,8 @@ Chrome Dino-style endless runner built with **Flutter** & **Flame Engine** for A
 | Technology | Purpose |
 |------------|---------|
 | Flutter 3.2+ | Cross-platform UI |
-| Flame 1.37 | Game engine, components, game loop |
+| Flame 1.17+ | Game engine, components, game loop |
+| flame_audio 2.1+ | Sound effect playback |
 
 ## Quick Start
 
@@ -41,4 +43,9 @@ flutter build apk --release
 - [GAME_DESIGN.md](docs/GAME_DESIGN.md) — Game design
 - [COMPONENTS.md](docs/COMPONENTS.md) — Components
 - [ASSETS.md](docs/ASSETS.md) — Assets
+- [SOUNDS.md](docs/SOUNDS.md) — Audio system
+- [SYSTEMS.md](docs/SYSTEMS.md) — Score & audio systems
+- [API.md](docs/API.md) — Public API reference
+- [DEPLOY.md](docs/DEPLOY.md) — Build & install
+- [CHANGELOG.md](CHANGELOG.md) — Version history
 - [TODO.md](TODO.md) — Tasks

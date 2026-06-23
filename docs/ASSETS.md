@@ -8,8 +8,20 @@
 | `assets/images/dino/dino_run_01.png` | Run frame 1 |
 | `assets/images/dino/dino_run_02.png` | Run frame 2 |
 | `assets/images/dino/dino_run_03.png` | Run frame 3 |
+| `assets/images/dino/ave.png` | Pterodactyl obstacle sprite (311x194) |
 
-Cycle: 4 frames, 10 FPS animation speed.
+Dino cycle: 4 frames, 10 FPS animation speed.
+
+## Audio
+
+| File | Usage | Duration |
+|------|-------|----------|
+| `assets/audio/jump.wav` | Jump sound (ascending chirp) | 150ms |
+| `assets/audio/death.wav` | Death sound (descending + noise) | 500ms |
+| `assets/audio/score.wav` | Score point (bright ding) | 100ms |
+| `assets/audio/milestone.wav` | Every 100pts (ascending arpeggio) | 350ms |
+
+Generated procedurally with Python (`wave` + `math` modules). Mono, 44100Hz, 16-bit PCM.
 
 ## App Icon
 
@@ -19,3 +31,4 @@ Cycle: 4 frames, 10 FPS animation speed.
 ## Fallback
 
 If sprites fail to load, all entities render via Canvas (geometric shapes). No crash.
+If audio fails to load, `AudioSystem` silently skips playback. No crash.

@@ -11,8 +11,8 @@ class GameConfig {
   static const double groundY = 340;
   static const double dinoX = 80;
 
-  static const double jumpVelocity = -13;
-  static const double gravity = 0.65;
+  static const double jumpVelocity = -15;
+  static const double gravity = 0.6;
 
   static const double initialSpeed = 6.0;
   static const double maxSpeed = 18.0;
